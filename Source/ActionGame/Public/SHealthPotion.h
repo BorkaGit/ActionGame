@@ -1,0 +1,21 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "SPowerUpBase.h"
+#include "SHealthPotion.generated.h"
+
+
+UCLASS()
+class ACTIONGAME_API ASHealthPotion : public ASPowerUpBase
+{
+	GENERATED_BODY()
+
+protected:
+	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
+	UPROPERTY(EditAnywhere)
+	float HealthAmount;
+
+};
