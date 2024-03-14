@@ -3,39 +3,21 @@
 
 #include "SMagicProjectile.h"
 
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SCharacter.h"
+#include "SGameplayFunctionLibrary.h"
 #include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "SActionEffect.h"
 
 
 ASMagicProjectile::ASMagicProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	DamageAmount = 20.0f;
-}
-
-void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor && OtherActor != GetInstigator())
-	{
-		AudioComponent->Stop();
-		AudioComponent->SetSound(ImpactSound);
-		AudioComponent->Play();
-
-		UGameplayStatics::PlayWorldCameraShake(GetWorld(),ImpactCameraShake,GetActorLocation(),100.0f,1000.0f);
-		
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (AttributeComp)
-		{
-			AttributeComp->ApplyHealthChange(-DamageAmount);
-
-			Destroy();
-		}
-	}
 }
 
 
@@ -45,6 +27,12 @@ void ASMagicProjectile::PostInitializeComponents()
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASMagicProjectile::OnActorOverlap);
 
 	AudioComponent->SetSound(FlightSound);
+}
+
+void ASMagicProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 void ASMagicProjectile::BeginPlay()
@@ -59,9 +47,40 @@ void ASMagicProjectile::BeginPlay()
 	AudioComponent->Play();
 }
 
-void ASMagicProjectile::Tick(float DeltaTime)
+void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	if (!OtherActor)
+	{
+		return;
+	}
 
+	APawn* InstigatorActor = GetInstigator();
+	if (OtherActor != InstigatorActor)
+	{
+		AudioComponent->Stop();
+		AudioComponent->SetSound(ImpactSound);
+		AudioComponent->Play();
+
+		USActionComponent* ActionComponent = USActionComponent::GetAction(OtherActor);
+		if ( ActionComponent && ActionComponent->ActiveGameplayTags.HasTag(ParryTag) )
+		{
+			MovementComp->Velocity *= -1.f;
+
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+		
+		if ( USGameplayFunctionLibrary::ApplyDirectionalDamage(InstigatorActor,OtherActor,DamageAmount,SweepResult) )
+		{
+			if (ActionComponent)
+			{
+				ActionComponent->AddAction(GetInstigator(), BurningActionClass);
+			}
+		}
+	
+		Destroy();
+	}
 }
+
+
 

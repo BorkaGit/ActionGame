@@ -11,10 +11,10 @@ EBTNodeResult::Type USBTTaskNode_Heal::ExecuteTask(UBehaviorTreeComponent& Owner
 	if (ensure(MyController))
 	{
 		APawn* Pawn = MyController->GetPawn();
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(Pawn->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Pawn);
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(AttributeComp->GetHealthMax() - AttributeComp->GetHealth());
+			AttributeComp->ApplyHealthChange(nullptr, AttributeComp->GetHealthMax() - AttributeComp->GetHealth());
 		}
 		
 	}

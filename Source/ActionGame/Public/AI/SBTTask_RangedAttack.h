@@ -11,9 +11,14 @@ UCLASS()
 class ACTIONGAME_API USBTTask_RangedAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
+	
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ProjectileClass;
-	
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float MaxBulletSpread = 2.0f;
 };

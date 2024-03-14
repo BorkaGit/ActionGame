@@ -4,17 +4,19 @@
 #include "SHealthPotion.h"
 
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	ISGameplayInterface::Interact_Implementation(InstigatorPawn);
 	
-	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-	if (AttributeComp && AttributeComp->GetHealth() != AttributeComp->GetHealthMax())
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(InstigatorPawn);
+	ASPlayerState* PlayerState = InstigatorPawn->GetPlayerState<ASPlayerState>();
+	if (AttributeComp && AttributeComp->GetHealth() != AttributeComp->GetHealthMax() && PlayerState && PlayerState->IsEnoughCredits(CreditsPrice) )
 	{
 		RespawnPickupLogic();
-		AttributeComp->ApplyHealthChange(HealthAmount);
-		
+		AttributeComp->ApplyHealthChange(this, HealthAmount);
+		PlayerState->AddCredits(-CreditsPrice);
 	}
 }

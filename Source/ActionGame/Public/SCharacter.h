@@ -6,36 +6,18 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class USActionComponent;
 class USAttributeComponent;
 class USInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UAnimMontage;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class ACTIONGAME_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-protected:
-	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Attack")	
-	TSubclassOf<AActor> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")	
-	TSubclassOf<AActor> BlackHoleClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")	
-	TSubclassOf<AActor> DashProjectileClass;
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")	
-	UAnimMontage* AttackAnim;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
-	FTimerHandle TimerHandle_SecondaryAttack;
-
-	FTimerHandle TimerHandle_BlackHoleLifetime;
 	
 public:
 	ASCharacter();
@@ -47,39 +29,40 @@ protected:
 
 	void MoveRight(float Value);
 
+	void SprintStart();
+
+	void SprintStop();
+	
 	void PrimaryAttack();
 	
-	void PrimaryAttack_TimeElapsed();
-	
 	void SecondaryAttack();
-
-	void SecondaryAttack_TimeElapsed();
-	
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 	
 	void PrimaryInteract();
 
 	void Dash();
 
-	void Dash_TimeElapsed();
-
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 	virtual void PostInitializeComponents() override;
+
+	virtual FVector GetPawnViewLocation() const override;
 	
 	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* SpringArmComp;
+	USpringArmComponent* SpringArmComponent;
 	
 	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* CameraComp;
+	UCameraComponent* CameraComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	USInteractionComponent* InteractionComp;
+	USInteractionComponent* InteractionComponent;
+ 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USAttributeComponent* AttributeComp;
-
+	USActionComponent* ActionComponent;
+	
 	UPROPERTY(Blueprintable, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic*> MatInsts;
 	
@@ -87,5 +70,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100.0f);
 
 };

@@ -15,7 +15,9 @@ class ACTIONGAME_API ASHealthPotion : public ASPowerUpBase
 protected:
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	UPROPERTY(EditAnywhere)
-	float HealthAmount;
-
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+	float HealthAmount = 25.0f;
+	
+	UPROPERTY(EditAnywhere,  meta = (ClampMin = "0"))
+	int32 CreditsPrice = 10;
 };

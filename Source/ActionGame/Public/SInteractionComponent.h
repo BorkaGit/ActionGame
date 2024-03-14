@@ -7,21 +7,42 @@
 #include "SInteractionComponent.generated.h"
 
 
+class USWorldUserWidget;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONGAME_API USInteractionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	USInteractionComponent();
-
-	void PrimaryInteract();
-	
 protected:
-	virtual void BeginPlay() override;
 
-public:	
+	void FindBestInteractable();
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<USWorldUserWidget> DefaultWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceDistance = 500.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceRadius = 30.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	TEnumAsByte<ECollisionChannel> CollisionChannel = ECC_WorldDynamic;
+	
+public:
+	
+	USInteractionComponent();
+	
+	void PrimaryInteract();
+	
+	private:
+	
+	UPROPERTY(Transient)
+	AActor* FocusedActor;
+
+	UPROPERTY(Transient)
+	USWorldUserWidget* DefaultWidgetInstance;
 };

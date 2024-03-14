@@ -3,6 +3,7 @@
 
 #include "AI/SBTTask_RangedAttack.h"
 #include "AIController.h"
+#include "SAttributeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 
@@ -20,13 +21,16 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 		FVector MuzzleLocation = MyPawn->GetMesh()->GetSocketLocation("Muzzle_01");
 
 		AActor* TargetActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("TargetActor"));
-		if (TargetActor == nullptr)
+		if (TargetActor == nullptr || !USAttributeComponent::IsActorALive(TargetActor))
 		{
 			return EBTNodeResult::Failed;
 		}
-
+		
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		FRotator MuzzleRotation = Direction.Rotation();
+
+		MuzzleRotation.Pitch += FMath::RandRange(0.0f, MaxBulletSpread);
+		MuzzleRotation.Yaw += FMath::RandRange(-MaxBulletSpread, MaxBulletSpread);
 
 		FActorSpawnParameters Params;
 		Params.Instigator = MyPawn;

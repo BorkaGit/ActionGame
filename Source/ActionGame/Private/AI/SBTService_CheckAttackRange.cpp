@@ -14,18 +14,15 @@ void USBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	UBlackboardComponent* BlackBoardComp = OwnerComp.GetBlackboardComponent();
 	if (ensure(BlackBoardComp))
 	{
-		AActor* TargetActor = Cast<AActor>(BlackBoardComp->GetValueAsObject("TargetActor"));
-		if (TargetActor)
+		if (const AActor* TargetActor = Cast<AActor>(BlackBoardComp->GetValueAsObject("TargetActor")))
 		{
-			AAIController* MyController = OwnerComp.GetAIOwner();
-			if (ensure(MyController))
+			if (const AAIController* MyController = OwnerComp.GetAIOwner(); ensure(MyController))
 			{
-				APawn* AIPawn = MyController->GetPawn();
-				if (ensure(AIPawn))
+				if (const APawn* AIPawn = MyController->GetPawn(); ensure(AIPawn))
 				{
-					float DistanceTo = FVector::Distance(TargetActor->GetActorLocation(), AIPawn->GetActorLocation());
+					const float DistanceTo = FVector::Distance(TargetActor->GetActorLocation(), AIPawn->GetActorLocation());
 
-					bool bWithinRange = DistanceTo <= 2000.0f;
+					const bool bWithinRange = DistanceTo <= 2000.0f;
 					
 					bool bHasLOS = false;
 					if (bWithinRange)
@@ -38,5 +35,4 @@ void USBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, u
 			}
 		}
 	}
-	
 }

@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "SProjectileBase.h"
 #include "GameFramework/Actor.h"
 #include "SMagicProjectile.generated.h"
 
+class USActionEffect;
 class USoundBase;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
@@ -20,9 +22,7 @@ public:
 	ASMagicProjectile();
 
 protected:
-
-	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	TSubclassOf<class UCameraShakeBase> ImpactCameraShake = nullptr;
+	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UParticleSystem* CastParticle = nullptr;
@@ -34,7 +34,13 @@ protected:
 	USoundBase* ImpactSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
-	float DamageAmount;
+	float DamageAmount = 20.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect> BurningActionClass;
 	
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
